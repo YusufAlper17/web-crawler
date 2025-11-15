@@ -1,3 +1,9 @@
+<div align="right">
+
+[English](README.md) | [Türkçe](README.tr.md)
+
+</div>
+
 Web Crawler
 
 FastAPI tabanlı backend ile React + Vite arayüzüne sahip modern ve ölçeklenebilir bir web tarayıcı. Web sitelerini tarayın, iç link ağacını görselleştirin ve verileri farklı formatlarda dışa aktarın.
@@ -64,14 +70,25 @@ Paylaştığınız görüntüler için önerilen isimler:
 - İndirme merkezi → `download-center.png`
 
 ![Dashboard](docs/screenshots/dashboard.png)
+Dashboard: Canlı istatistikler, son job'lar ve hızlı aksiyonların bulunduğu ana kontrol paneli.
 ![Table view](docs/screenshots/table-view.png)
+Tablo Görünümü: Çekilen sayfalar, status kodları, başlıklar ve arama/filtreleme kontrolleri.
 ![Tree view](docs/screenshots/tree-view.png)
+Ağaç Görünümü: Site içi link ağacını interaktif şekilde keşfetme (zoom, pan, node genişletme).
 ![Download center](docs/screenshots/download-center.png)
+İndirme Merkezi: JSON/CSV/Excel olarak veri indirme seçenekleri ve kapsam ayarları.
 
 Sorun giderme
-- 8000 portu dolu: Mevcut süreci kapatın (`lsof -ti :8000 | xargs kill -9`) ve uvicorn’u yeniden başlatın.
+- 8000 portu dolu (backend): Mevcut süreci kapatın (`lsof -ti :8000 | xargs kill -9`) ve uvicorn’u yeniden başlatın.
+- 3000/5173 portu dolu (frontend): `npm run dev -- --port 3000` veya 5173 ile farklı bir port seçin.
 - Vite farklı port seçiyor: Terminal çıktısını veya `frontend/frontend.log` dosyasını kontrol edin. İsterseniz `npm run dev -- --port 3000` ile sabitleyin.
-- SQLite yolu: `backend/app/config.py` göreli SQLite yolunu backend köküne mutlak olarak sabitler.
+- CORS hatası: `backend/app/config.py` içindeki `CORS_ORIGINS` veya `.env` üstünden izin verilen origin’lere frontend adresini ekleyin.
+- `.env` okunmuyor: Örnek dosyayı doğru konuma kopyaladığınızdan emin olun (`backend/ENV.EXAMPLE` → `backend/.env`, `frontend/ENV.EXAMPLE` → `frontend/.env`) ve servisleri yeniden başlatın.
+- Veritabanına bağlanamıyor: `DATABASE_URL` değerini kontrol edin. Postgres kullanıyorsanız Docker’da servis adını (`db`) ve doğru portu (`5432`) kullandığınızdan emin olun.
+- SQLite yolu: `backend/app/config.py` göreli SQLite yolunu backend köküne mutlak olarak sabitler. Yazma izinleri için proje klasöründe yetkileri kontrol edin.
+- Export indirilemiyor: Tarayıcı popup/indirme izinlerini ve backend cevap boyut limitlerini kontrol edin. Büyük Excel çıktıları için daha küçük kapsam seçin.
+- Redis gerekli mi?: Opsiyoneldir; rate limiting ve queue için önerilir. Yoksa ilgili özellikler devre dışı kalabilir.
+- Node/Python sürümleri: Node 18+/20+ ve Python 3.13+ önerilir. Farklı sürümlerde derleme sorunları yaşayabilirsiniz.
 
 Katkı
 Önemli değişiklikler için önce bir konu açın. PR’lar memnuniyetle karşılanır.

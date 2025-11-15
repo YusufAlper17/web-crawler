@@ -1,3 +1,9 @@
+<div align="right">
+
+[English](README.md) | [Türkçe](README.tr.md)
+
+</div>
+
 Web Crawler
 
 A modern, scalable web crawler with a FastAPI backend and a React + Vite frontend. Crawl websites, analyze internal link graphs, and export your data in multiple formats.
@@ -64,14 +70,26 @@ For example, the files you shared can be saved with these names:
 - Download center → `download-center.png`
 
 ![Dashboard](docs/screenshots/dashboard.png)
+Dashboard: Live stats, recent jobs and quick actions on the main control panel.
 ![Table view](docs/screenshots/table-view.png)
+Table View: Crawled pages with status codes, titles, search and filtering controls.
 ![Tree view](docs/screenshots/tree-view.png)
+Tree View: Explore the internal link graph interactively (zoom, pan, expand nodes).
 ![Download center](docs/screenshots/download-center.png)
+Download Center: Options to export data as JSON/CSV/Excel with flexible scopes.
 
 Troubleshooting
 - Port already in use on 8000 (backend): stop the existing process (`lsof -ti :8000 | xargs kill -9`) and restart uvicorn.
 - Vite chooses a different port: check terminal output or `frontend/frontend.log`. You can fix the port via `npm run dev -- --port 3000`.
 - SQLite path resolution: `backend/app/config.py` resolves relative SQLite paths to an absolute file in the backend root.
+- Frontend port conflicts (3000/5173): run `npm run dev -- --port 3000` or pick a free port.
+- CORS errors: Add your frontend origin to `CORS_ORIGINS` in `backend/app/config.py` or via `.env`.
+- `.env` not loading: Ensure example files are copied correctly (`backend/ENV.EXAMPLE` → `backend/.env`, `frontend/ENV.EXAMPLE` → `frontend/.env`) and restart services.
+- Database connection issues: Verify `DATABASE_URL`. For Docker compose, use the service name (e.g., `db`) and correct port (`5432`) for Postgres.
+- SQLite permissions: Ensure the project folder allows write access for the SQLite file.
+- Exports not downloading: Check browser download permissions and backend response size limits. For very large Excel files, export a smaller scope.
+- Redis required?: Optional. Recommended for rate limiting/queues; without it, related features may be limited.
+- Node/Python versions: Prefer Node 18+/20+ and Python 3.13+; older versions may cause build issues.
 
 License
 Specify your license of choice, e.g., MIT.
