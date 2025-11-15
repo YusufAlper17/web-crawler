@@ -1,0 +1,108 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+.coverage*
+
+# Node
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.parcel-cache/
+dist/
+build/
+
+# IDE/Editor
+.idea/
+.vscode/
+*.swp
+
+# Env & Secrets
+.env
+*.env
+backend/.env
+frontend/.env
+
+# Runtime artifacts
+.backend.pid
+.frontend.pid
+backend/*.pid
+backend/crawler.log
+backend/backend.log
+frontend/frontend.log
+*.log
+
+# Database/files
+webcrawler.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.docker/
+*.tar
+
+# Coverage
+coverage/
+
+# Misc
+*.tmp
+*.cache
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# Frontend
+node_modules/
+dist/
+.next/
+out/
+
+# Docker
+.dockerignore
+
