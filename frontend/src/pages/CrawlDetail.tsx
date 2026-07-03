@@ -140,11 +140,53 @@ const CrawlDetail = () => {
     },
   })
 
+  // Çalışma zamanı ayarları (serverless "step" modunu algılamak için)
+  const { data: runtimeSettings } = useQuery({
+    queryKey: ['runtimeSettings'],
+    queryFn: () => crawlApi.getRuntimeSettings(),
+    staleTime: Infinity,
+    retry: false,
+  })
+
+  const steppingRef = useRef(false)
+
   useEffect(() => {
     if (pagesData) {
       setPages(pagesData)
     }
   }, [pagesData])
+
+  // Serverless (Vercel) modunda crawl'ı adım adım ilerlet
+  useEffect(() => {
+    if (runtimeSettings?.crawl_mode !== 'step' || !jobId) return
+    const currentStatus = status?.status || job?.status
+    if (currentStatus !== 'running' && currentStatus !== 'pending') return
+    if (steppingRef.current) return
+
+    let cancelled = false
+    const drive = async () => {
+      steppingRef.current = true
+      try {
+        while (!cancelled) {
+          const res = await crawlApi.stepCrawl(Number(jobId))
+          queryClient.invalidateQueries({ queryKey: ['crawlStatus', jobId] })
+          queryClient.invalidateQueries({ queryKey: ['crawlJob', jobId] })
+          queryClient.invalidateQueries({ queryKey: ['crawlPages', jobId] })
+          queryClient.invalidateQueries({ queryKey: ['crawlTree', jobId] })
+          if (res.status !== 'running' && res.status !== 'pending') break
+          await new Promise((r) => setTimeout(r, 350))
+        }
+      } catch {
+        // Adım hatası: polling durumu zaten yansıtacak
+      } finally {
+        steppingRef.current = false
+      }
+    }
+    drive()
+    return () => {
+      cancelled = true
+    }
+  }, [runtimeSettings?.crawl_mode, status?.status, job?.status, jobId, queryClient])
 
   // Tab değiştiğinde pages'ı yükle
   useEffect(() => {

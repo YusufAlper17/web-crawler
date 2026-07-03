@@ -1,0 +1,8 @@
+# Vercel serverless function bağımlılıkları (api/index.py)
+# Hafif tutuldu: pandas/openpyxl/tldextract/lxml YOK -> fonksiyon boyut limitine takılmaz.
+fastapi==0.104.1
+sqlalchemy>=2.0.30
+pydantic>=2.5.0
+httpx==0.25.2
+beautifulsoup4==4.12.2
+psycopg[binary]>=3.2.0

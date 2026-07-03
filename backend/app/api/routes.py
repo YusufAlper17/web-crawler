@@ -70,6 +70,7 @@ def get_runtime_settings():
         frontend_url=settings.PUBLIC_FRONTEND_URL,
         database_engine=database_engine,
         deployment_target=settings.DEPLOYMENT_TARGET,
+        crawl_mode="background",
         crawler_defaults=CrawlerSettings(
             request_delay=settings.REQUEST_DELAY,
             timeout=settings.TIMEOUT,

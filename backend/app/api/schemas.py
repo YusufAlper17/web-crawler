@@ -123,5 +123,6 @@ class RuntimeSettingsResponse(BaseModel):
     frontend_url: str
     database_engine: str
     deployment_target: str
+    crawl_mode: str = "background"
     crawler_defaults: CrawlerSettings
 

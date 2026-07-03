@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? 'http://localhost:8000/api/v1' : '/api/v1')
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -96,6 +98,7 @@ export interface RuntimeSettings {
   frontend_url: string
   database_engine: string
   deployment_target: string
+  crawl_mode?: 'background' | 'step'
   crawler_defaults: CrawlerSettings
 }
 
@@ -112,6 +115,12 @@ export const crawlApi = {
 
   getCrawlStatus: async (jobId: number): Promise<CrawlStatus> => {
     const response = await api.get<CrawlStatus>(`/crawl/${jobId}/status`)
+    return response.data
+  },
+
+  // Serverless (step) modunda tek bir crawl adımını ilerletir
+  stepCrawl: async (jobId: number): Promise<CrawlStatus> => {
+    const response = await api.post<CrawlStatus>(`/crawl/${jobId}/step`)
     return response.data
   },
 
