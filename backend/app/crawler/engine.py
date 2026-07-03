@@ -30,8 +30,13 @@ class CrawlerEngine:
         self.site_analyzer = SiteAnalyzer()
         self.base_domain: Optional[str] = None
         self.site_type: Optional[str] = None
+        self.job_settings: Dict = {}
         self.semaphore = asyncio.Semaphore(settings.CONCURRENT_REQUESTS)
         self.last_request_time: Dict[str, float] = {}
+
+    def _setting(self, key: str, default):
+        value = self.job_settings.get(key)
+        return default if value is None else value
         
     async def start(self):
         """Crawling işlemini başlatır"""
@@ -44,6 +49,9 @@ class CrawlerEngine:
             
             job.status = JobStatus.RUNNING
             job.started_at = datetime.utcnow()
+            self.job_settings = job.settings or {}
+            concurrent_requests = int(self._setting("concurrent_requests", settings.CONCURRENT_REQUESTS))
+            self.semaphore = asyncio.Semaphore(max(1, min(concurrent_requests, 50)))
             db.commit()
             
             self.base_domain = get_base_domain(job.base_url)
@@ -184,8 +192,9 @@ class CrawlerEngine:
         
         if domain in self.last_request_time:
             time_since_last = current_time - self.last_request_time[domain]
-            if time_since_last < settings.REQUEST_DELAY:
-                await asyncio.sleep(settings.REQUEST_DELAY - time_since_last)
+            request_delay = float(self._setting("request_delay", settings.REQUEST_DELAY))
+            if time_since_last < request_delay:
+                await asyncio.sleep(request_delay - time_since_last)
         
         self.last_request_time[domain] = time.time()
     
@@ -196,13 +205,15 @@ class CrawlerEngine:
             url_marked_visited = False
             
             try:
-                # robots.txt kontrolü
-                can_fetch = await self.robots_checker.can_fetch(url, settings.USER_AGENT)
-                if not can_fetch:
-                    logger.debug(f"🚫 Robots.txt izin vermiyor: {url}")
-                    # robots.txt engelliyorsa URL'yi ziyaret edildi olarak işaretle ama sayfa sayma
-                    self.visited_urls.add(url)
-                    return
+                user_agent = self._setting("user_agent", settings.USER_AGENT)
+                respect_robots = bool(self._setting("respect_robots_txt", True))
+
+                if respect_robots:
+                    can_fetch = await self.robots_checker.can_fetch(url, user_agent)
+                    if not can_fetch:
+                        logger.debug(f"🚫 Robots.txt izin vermiyor: {url}")
+                        self.visited_urls.add(url)
+                        return
                 
                 # URL'yi ziyaret edildi olarak işaretle (HTTP isteğinden önce, tekrar denenmesini önlemek için)
                 self.visited_urls.add(url)
@@ -211,9 +222,9 @@ class CrawlerEngine:
                 logger.info(f"🕷️ Crawling: {url} (depth: {depth})")
                 
                 async with httpx.AsyncClient(
-                    timeout=settings.TIMEOUT,
-                    follow_redirects=True,
-                    headers={'User-Agent': settings.USER_AGENT}
+                    timeout=int(self._setting("timeout", settings.TIMEOUT)),
+                    follow_redirects=bool(self._setting("follow_redirects", True)),
+                    headers={'User-Agent': user_agent}
                 ) as client:
                     response = await client.get(url)
                     
@@ -294,8 +305,10 @@ class CrawlerEngine:
                         db.close()
                         return
                         
+                    extract_metadata = bool(self._setting("extract_metadata", True))
+
                     # Site analizi yap (sadece ilk sayfa için veya site tipi bilinmiyorsa)
-                    if not self.site_type or depth == 0:
+                    if extract_metadata and (not self.site_type or depth == 0):
                         try:
                             site_analysis = self.site_analyzer.analyze_site(html, url)
                             self.site_type = site_analysis.get('site_type', 'unknown')
@@ -305,7 +318,7 @@ class CrawlerEngine:
                     
                     # Metadata çıkar
                     try:
-                        metadata = self.content_extractor.extract_metadata(html)
+                        metadata = self.content_extractor.extract_metadata(html) if extract_metadata else {}
                         # Site yapısına göre adapte olan içerik çıkarma
                         text_content = self.content_extractor.extract_text_content(html, url)
                     except Exception as e:
@@ -342,7 +355,7 @@ class CrawlerEngine:
                                 url=url,
                                 title=metadata.get('title'),
                                 content=text_content[:50000] if text_content else None,  # İlk 50k karakter
-                                html_content=html[:100000] if html else None,  # İlk 100k karakter
+                                html_content=html[:100000] if html and bool(self._setting("save_html_content", True)) else None,
                                 meta_description=metadata.get('description'),
                                 meta_keywords=metadata.get('keywords'),
                                 depth=depth,

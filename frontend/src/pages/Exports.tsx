@@ -103,12 +103,6 @@ const Exports = () => {
       // Bilgi mesajı göster
       toast.success(`${JSON.parse(selectedPages).length} sayfa seçili. İndirme konfigürasyonunu yapıp indirebilirsiniz.`, {
         duration: 5000,
-        icon: '📥',
-        style: {
-          borderRadius: '10px',
-          background: '#1a1f3a',
-          color: '#e0e0e0',
-        },
       })
       
       // localStorage'ı temizle
@@ -130,14 +124,7 @@ const Exports = () => {
       document.body.removeChild(a)
     },
     onSuccess: () => {
-      toast.success('İndirme başlatıldı!', {
-        icon: '✅',
-        style: {
-          borderRadius: '10px',
-          background: '#1a1f3a',
-          color: '#e0e0e0',
-        },
-      })
+      toast.success('İndirme başlatıldı!')
     },
     onError: (error: any) => {
       toast.error(error.message || 'İndirme başarısız')
@@ -157,14 +144,7 @@ const Exports = () => {
       document.body.removeChild(a)
     },
     onSuccess: () => {
-      toast.success('Toplu indirme başlatıldı!', {
-        icon: '✅',
-        style: {
-          borderRadius: '10px',
-          background: '#1a1f3a',
-          color: '#e0e0e0',
-        },
-      })
+      toast.success('Toplu indirme başlatıldı!')
     },
     onError: (error: any) => {
       toast.error(error.message || 'Toplu indirme başarısız')
@@ -259,7 +239,7 @@ const Exports = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
+        backgroundColor: 'background.default',
         pb: 4,
       }}
     >
@@ -269,9 +249,7 @@ const Exports = () => {
           <Card
             sx={{
               mb: 3,
-              background: 'rgba(26, 31, 58, 0.6)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(99, 102, 241, 0.2)',
+              backgroundColor: 'background.paper',
             }}
           >
             <CardContent>
@@ -292,13 +270,9 @@ const Exports = () => {
                   <Typography
                     variant="h4"
                     fontWeight={700}
-                    sx={{
-                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
+                    color="text.primary"
                   >
-                    📥 İndirme Merkezi
+                    İndirme Merkezi
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                     Crawl verilerinizi özelleştirerek indirin
@@ -320,9 +294,7 @@ const Exports = () => {
             <Fade in timeout={800}>
               <Card
                 sx={{
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                   position: 'sticky',
                   top: 20,
                 }}
@@ -530,9 +502,7 @@ const Exports = () => {
             <Fade in timeout={1000}>
               <Card
                 sx={{
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                 }}
               >
                 <CardContent>
@@ -632,11 +602,9 @@ const JobSelectionCard = ({
       sx={{
         p: 2.5,
         mb: 2,
-        background: selected
-          ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)'
-          : 'rgba(26, 31, 58, 0.4)',
+        backgroundColor: selected ? 'rgba(79, 70, 229, 0.08)' : 'background.paper',
         border: '2px solid',
-        borderColor: selected ? 'primary.main' : 'rgba(99, 102, 241, 0.1)',
+        borderColor: selected ? 'primary.main' : 'divider',
         transition: 'all 0.3s',
         '&:hover': {
           borderColor: 'primary.main',
@@ -658,11 +626,7 @@ const JobSelectionCard = ({
             noWrap
             sx={{
               mb: 1,
-              background: selected
-                ? 'linear-gradient(135deg, #e0e0e0 0%, #a0a0a0 100%)'
-                : 'none',
-              WebkitBackgroundClip: selected ? 'text' : 'none',
-              WebkitTextFillColor: selected ? 'transparent' : 'inherit',
+              color: selected ? 'primary.light' : 'text.primary',
             }}
           >
             {job.base_url}

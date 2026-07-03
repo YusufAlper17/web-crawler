@@ -7,7 +7,6 @@ import {
   ExpandLess,
   Link as LinkIcon,
   CheckCircle,
-  Cancel,
   Home,
 } from '@mui/icons-material'
 
@@ -103,7 +102,7 @@ const TreeVisualization = ({
     svg.call(zoom as any)
 
     // Links - dikey için düz çizgiler
-    const links = g
+    g
       .selectAll('.link')
       .data(treeData.links())
       .enter()
@@ -225,7 +224,7 @@ const TreeVisualization = ({
       .attr('font-size', '10px')
       .text((d) => {
         const node = d.data as TreeNode
-        return node.status_code
+        return node.status_code ?? null
       })
       .attr('fill', (d) => {
         const node = d.data as TreeNode
@@ -435,7 +434,7 @@ const TreeVisualization = ({
           sx={{ bgcolor: '#10b981', color: 'white' }}
         />
         <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>
-          💡 Zoom için scroll, pan için sürükle
+          Zoom için scroll, pan için sürükle
         </Typography>
       </Box>
     </Box>

@@ -255,7 +255,7 @@ const CrawlDetail = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
+        backgroundColor: 'background.default',
         pb: 4,
       }}
     >
@@ -265,9 +265,7 @@ const CrawlDetail = () => {
           <Card
             sx={{
               mb: 3,
-              background: 'rgba(26, 31, 58, 0.6)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(99, 102, 241, 0.2)',
+              backgroundColor: 'background.paper',
             }}
           >
             <CardContent>
@@ -276,7 +274,7 @@ const CrawlDetail = () => {
                   onClick={() => navigate('/')}
                   sx={{
                     '&:hover': {
-                      background: 'rgba(99, 102, 241, 0.2)',
+                      background: '#ECEDFE',
                       transform: 'scale(1.1)',
                     },
                     transition: 'all 0.2s',
@@ -290,9 +288,7 @@ const CrawlDetail = () => {
                     fontWeight={700}
                     sx={{
                       mb: 1,
-                      background: 'linear-gradient(135deg, #e0e0e0 0%, #a0a0a0 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
+                      color: 'text.primary',
                     }}
                   >
                     {job.base_url}
@@ -375,21 +371,7 @@ const CrawlDetail = () => {
                               navigate('/exports')
                             }
                           }}
-                          sx={{
-                            px: 3,
-                            py: 1.2,
-                            borderRadius: 3,
-                            borderWidth: 2,
-                            borderColor: 'rgba(129, 140, 248, 0.5)',
-                            color: 'primary.light',
-                            background: 'rgba(26, 31, 58, 0.4)',
-                            boxShadow: 'inset 0 0 0 1px rgba(99, 102, 241, 0.3)',
-                            '&:hover': {
-                              background: 'rgba(26, 31, 58, 0.6)',
-                              borderColor: 'primary.main',
-                              boxShadow: '0 10px 24px rgba(99,102,241,0.25)'
-                            },
-                          }}
+                          sx={{ minWidth: 180 }}
                         >
                           İndirme Seçenekleri
                         </Button>
@@ -408,9 +390,7 @@ const CrawlDetail = () => {
             <Card
               sx={{
                 mb: 3,
-                background: 'rgba(26, 31, 58, 0.6)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(99, 102, 241, 0.2)',
+                backgroundColor: 'background.paper',
               }}
             >
               <CardContent>
@@ -424,9 +404,7 @@ const CrawlDetail = () => {
                   <Typography
                     variant="h5"
                     sx={{
-                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
+                      color: 'primary.main',
                       fontWeight: 700,
                     }}
                   >
@@ -439,11 +417,11 @@ const CrawlDetail = () => {
                   sx={{
                     height: 14,
                     borderRadius: 7,
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    backgroundColor: 'rgba(27, 31, 39, 0.08)',
                     mb: 3,
                     '& .MuiLinearProgress-bar': {
                       borderRadius: 7,
-                      background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)',
+                      backgroundColor: 'primary.main',
                     },
                   }}
                 />
@@ -453,8 +431,8 @@ const CrawlDetail = () => {
                       sx={{
                         p: 2,
                         textAlign: 'center',
-                        background: 'rgba(16, 185, 129, 0.1)',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        background: '#E4F5E9',
+                        border: '1px solid #C8E6C9',
                       }}
                     >
                       <Typography variant="h4" color="success.main" fontWeight={700}>
@@ -470,8 +448,8 @@ const CrawlDetail = () => {
                       sx={{
                         p: 2,
                         textAlign: 'center',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        background: '#FCE9E7',
+                        border: '1px solid #F5C6C2',
                       }}
                     >
                       <Typography variant="h4" color="error.main" fontWeight={700}>
@@ -487,8 +465,8 @@ const CrawlDetail = () => {
                       sx={{
                         p: 2,
                         textAlign: 'center',
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        border: '1px solid rgba(99, 102, 241, 0.3)',
+                        background: '#ECEDFE',
+                        border: '1px solid #DDDEFF',
                       }}
                     >
                       <Typography variant="h4" color="primary.main" fontWeight={700}>
@@ -504,8 +482,8 @@ const CrawlDetail = () => {
                       sx={{
                         p: 2,
                         textAlign: 'center',
-                        background: 'rgba(26, 31, 58, 0.4)',
-                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                        background: '#F3F4FE',
+                        border: '1px solid #E3E4FE',
                       }}
                     >
                       <Typography variant="h4" color="text.primary" fontWeight={700}>
@@ -527,16 +505,15 @@ const CrawlDetail = () => {
           <Card
             sx={{
               mb: 3,
-              background: 'rgba(26, 31, 58, 0.6)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(99, 102, 241, 0.2)',
+              backgroundColor: 'background.paper',
             }}
           >
             <Tabs
               value={activeTab}
               onChange={(_, newValue) => setActiveTab(newValue)}
               sx={{
-                borderBottom: '1px solid rgba(99, 102, 241, 0.2)',
+                borderBottom: '1px solid',
+                borderColor: 'divider',
                 '& .MuiTab-root': {
                   textTransform: 'none',
                   fontWeight: 600,
@@ -558,9 +535,7 @@ const CrawlDetail = () => {
               <Fade in timeout={1200}>
                 <Card
                   sx={{
-                    background: 'rgba(26, 31, 58, 0.6)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                    backgroundColor: 'background.paper',
                   }}
                 >
                   <CardContent>
@@ -599,8 +574,8 @@ const CrawlDetail = () => {
                                   setSelectedPages(new Set(filteredPages.map(p => p.id)))
                                 }}
                                 sx={{
-                                  bgcolor: 'rgba(99, 102, 241, 0.1)',
-                                  '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.2)' },
+                                  bgcolor: '#f8f9fa',
+                                  '&:hover': { bgcolor: '#E3E4FE' },
                                 }}
                               >
                                 <SelectAll />
@@ -611,8 +586,8 @@ const CrawlDetail = () => {
                                 size="small"
                                 onClick={() => setSelectedPages(new Set())}
                                 sx={{
-                                  bgcolor: 'rgba(239, 68, 68, 0.1)',
-                                  '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.2)' },
+                                  bgcolor: '#FCE9E7',
+                                  '&:hover': { bgcolor: '#FCE9E7' },
                                 }}
                               >
                                 <Deselect />
@@ -631,9 +606,9 @@ const CrawlDetail = () => {
                                     navigate('/exports')
                                   }}
                                   sx={{
-                                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                    backgroundColor: 'primary.main',
                                     '&:hover': {
-                                      background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                                      backgroundColor: 'primary.dark',
                                     },
                                   }}
                                 >
@@ -668,7 +643,7 @@ const CrawlDetail = () => {
                               bgcolor: statusFilter ? 'primary.main' : 'transparent',
                               color: statusFilter ? 'white' : 'text.secondary',
                               '&:hover': {
-                                bgcolor: statusFilter ? 'primary.dark' : 'rgba(99, 102, 241, 0.1)',
+                                bgcolor: statusFilter ? 'primary.dark' : '#ECEDFE',
                               },
                             }}
                           >
@@ -686,8 +661,8 @@ const CrawlDetail = () => {
                       <Alert
                         severity="info"
                         sx={{
-                          background: 'rgba(99, 102, 241, 0.1)',
-                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          background: '#ECEDFE',
+                          border: '1px solid #DDDEFF',
                         }}
                       >
                         {job?.status === 'running' || job?.status === 'pending'
@@ -699,15 +674,16 @@ const CrawlDetail = () => {
                         <TableContainer
                           component={Paper}
                           sx={{
-                            background: 'rgba(26, 31, 58, 0.4)',
-                            border: '1px solid rgba(99, 102, 241, 0.2)',
+                            bgcolor: 'background.paper',
+                            border: '1px solid',
+                            borderColor: 'divider',
                             maxHeight: 600,
                           }}
                         >
                           <Table stickyHeader>
                             <TableHead>
                               <TableRow>
-                                <TableCell padding="checkbox" sx={{ fontWeight: 600, bgcolor: 'rgba(99, 102, 241, 0.1)' }}>
+                                <TableCell padding="checkbox" sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}>
                                   <Checkbox
                                     indeterminate={selectedPages.size > 0 && selectedPages.size < pages.filter((p) => {
                                       if (searchQuery) {
@@ -765,33 +741,33 @@ const CrawlDetail = () => {
                                     color="primary"
                                   />
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600, bgcolor: 'rgba(99, 102, 241, 0.1)' }}>
+                                <TableCell sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}>
                                   URL
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600, bgcolor: 'rgba(99, 102, 241, 0.1)' }}>
+                                <TableCell sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}>
                                   Başlık
                                 </TableCell>
                                 <TableCell
                                   align="center"
-                                  sx={{ fontWeight: 600, bgcolor: 'rgba(99, 102, 241, 0.1)' }}
+                                  sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}
                                 >
                                   Derinlik
                                 </TableCell>
                                 <TableCell
                                   align="center"
-                                  sx={{ fontWeight: 600, bgcolor: 'rgba(99, 102, 241, 0.1)' }}
+                                  sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}
                                 >
                                   Status
                                 </TableCell>
                                 <TableCell
                                   align="center"
-                                  sx={{ fontWeight: 600, bgcolor: 'rgba(99, 102, 241, 0.1)' }}
+                                  sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}
                                 >
                                   Tarih
                                 </TableCell>
                                 <TableCell
                                   align="center"
-                                  sx={{ fontWeight: 600, bgcolor: 'rgba(99, 102, 241, 0.1)' }}
+                                  sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}
                                 >
                                   İşlemler
                                 </TableCell>
@@ -819,9 +795,9 @@ const CrawlDetail = () => {
                                     key={page.id}
                                     sx={{
                                       '&:hover': {
-                                        bgcolor: 'rgba(99, 102, 241, 0.1)',
+                                        bgcolor: '#f8f9fa',
                                       },
-                                      bgcolor: selectedPages.has(page.id) ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                                      bgcolor: selectedPages.has(page.id) ? '#E7F0FE' : 'transparent',
                                     }}
                                   >
                                     <TableCell padding="checkbox">
@@ -975,24 +951,22 @@ const CrawlDetail = () => {
                   <Card
                     sx={{
                       mt: 3,
-                      background: 'rgba(26, 31, 58, 0.6)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                      backgroundColor: 'background.paper',
                     }}
                   >
                     <CardContent>
                       <Typography variant="h6" gutterBottom fontWeight={600}>
                         Tablo İstatistikleri
                       </Typography>
-                      <Divider sx={{ mb: 2, borderColor: 'rgba(99, 102, 241, 0.2)' }} />
+                      <Divider sx={{ mb: 2, borderColor: 'divider' }} />
                       <Grid container spacing={2}>
                         <Grid item xs={6} sm={3}>
                           <Paper
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(99, 102, 241, 0.1)',
-                              border: '1px solid rgba(99, 102, 241, 0.3)',
+                              background: '#ECEDFE',
+                              border: '1px solid #DDDEFF',
                             }}
                           >
                             <Typography variant="h4" color="primary.main" fontWeight={700}>
@@ -1008,8 +982,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(16, 185, 129, 0.1)',
-                              border: '1px solid rgba(16, 185, 129, 0.3)',
+                              background: '#E4F5E9',
+                              border: '1px solid #C8E6C9',
                             }}
                           >
                             <Typography variant="h4" color="success.main" fontWeight={700}>
@@ -1025,8 +999,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(239, 68, 68, 0.1)',
-                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                              background: '#FCE9E7',
+                              border: '1px solid #F5C6C2',
                             }}
                           >
                             <Typography variant="h4" color="error.main" fontWeight={700}>
@@ -1042,8 +1016,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(245, 158, 11, 0.1)',
-                              border: '1px solid rgba(245, 158, 11, 0.3)',
+                              background: '#FDF0DC',
+                              border: '1px solid #FADCAB',
                             }}
                           >
                             <Typography variant="h4" color="warning.main" fontWeight={700}>
@@ -1068,9 +1042,7 @@ const CrawlDetail = () => {
               <Fade in timeout={1200}>
                 <Card
                   sx={{
-                    background: 'rgba(26, 31, 58, 0.6)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                    backgroundColor: 'background.paper',
                   }}
                 >
                   <CardContent>
@@ -1089,8 +1061,8 @@ const CrawlDetail = () => {
                       <Alert
                         severity="info"
                         sx={{
-                          background: 'rgba(99, 102, 241, 0.1)',
-                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          background: '#ECEDFE',
+                          border: '1px solid #DDDEFF',
                         }}
                       >
                         {job?.status === 'running' || job?.status === 'pending'
@@ -1108,24 +1080,22 @@ const CrawlDetail = () => {
                   <Card
                     sx={{
                       mt: 3,
-                      background: 'rgba(26, 31, 58, 0.6)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                      backgroundColor: 'background.paper',
                     }}
                   >
                     <CardContent>
                       <Typography variant="h6" gutterBottom fontWeight={600}>
                         Node İstatistikleri
                       </Typography>
-                      <Divider sx={{ mb: 2, borderColor: 'rgba(99, 102, 241, 0.2)' }} />
+                      <Divider sx={{ mb: 2, borderColor: 'divider' }} />
                       <Grid container spacing={2}>
                         <Grid item xs={6} sm={3}>
                           <Paper
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(99, 102, 241, 0.1)',
-                              border: '1px solid rgba(99, 102, 241, 0.3)',
+                              background: '#ECEDFE',
+                              border: '1px solid #DDDEFF',
                             }}
                           >
                             <Typography variant="h4" color="primary.main" fontWeight={700}>
@@ -1141,8 +1111,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(16, 185, 129, 0.1)',
-                              border: '1px solid rgba(16, 185, 129, 0.3)',
+                              background: '#E4F5E9',
+                              border: '1px solid #C8E6C9',
                             }}
                           >
                             <Typography variant="h4" color="success.main" fontWeight={700}>
@@ -1158,8 +1128,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(139, 92, 246, 0.1)',
-                              border: '1px solid rgba(139, 92, 246, 0.3)',
+                              background: '#ECEDFE',
+                              border: '1px solid #DDDEFF',
                             }}
                           >
                             <Typography variant="h4" color="secondary.main" fontWeight={700}>
@@ -1175,8 +1145,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(245, 158, 11, 0.1)',
-                              border: '1px solid rgba(245, 158, 11, 0.3)',
+                              background: '#FDF0DC',
+                              border: '1px solid #FADCAB',
                             }}
                           >
                             <Typography variant="h4" color="warning.main" fontWeight={700}>
@@ -1203,24 +1173,22 @@ const CrawlDetail = () => {
                 <Fade in timeout={1200}>
                   <Card
                     sx={{
-                      background: 'rgba(26, 31, 58, 0.6)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                      backgroundColor: 'background.paper',
                     }}
                   >
                     <CardContent>
                       <Typography variant="h6" gutterBottom fontWeight={600}>
                         Genel Crawl İstatistikleri
                       </Typography>
-                      <Divider sx={{ mb: 3, borderColor: 'rgba(99, 102, 241, 0.2)' }} />
+                      <Divider sx={{ mb: 3, borderColor: 'divider' }} />
                       <Grid container spacing={3}>
                         <Grid item xs={6} sm={4} md={2}>
                           <Paper
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(99, 102, 241, 0.1)',
-                              border: '1px solid rgba(99, 102, 241, 0.3)',
+                              background: '#ECEDFE',
+                              border: '1px solid #DDDEFF',
                             }}
                           >
                             <Typography variant="h4" color="primary.main" fontWeight={700}>
@@ -1236,8 +1204,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(239, 68, 68, 0.1)',
-                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                              background: '#FCE9E7',
+                              border: '1px solid #F5C6C2',
                             }}
                           >
                             <Typography variant="h4" color="error.main" fontWeight={700}>
@@ -1253,8 +1221,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(16, 185, 129, 0.1)',
-                              border: '1px solid rgba(16, 185, 129, 0.3)',
+                              background: '#E4F5E9',
+                              border: '1px solid #C8E6C9',
                             }}
                           >
                             <Typography variant="h4" color="success.main" fontWeight={700}>
@@ -1270,8 +1238,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(139, 92, 246, 0.1)',
-                              border: '1px solid rgba(139, 92, 246, 0.3)',
+                              background: '#ECEDFE',
+                              border: '1px solid #DDDEFF',
                             }}
                           >
                             <Typography variant="h4" color="secondary.main" fontWeight={700}>
@@ -1287,8 +1255,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(245, 158, 11, 0.1)',
-                              border: '1px solid rgba(245, 158, 11, 0.3)',
+                              background: '#FDF0DC',
+                              border: '1px solid #FADCAB',
                             }}
                           >
                             <Typography variant="h4" color="warning.main" fontWeight={700}>
@@ -1304,8 +1272,8 @@ const CrawlDetail = () => {
                             sx={{
                               p: 2,
                               textAlign: 'center',
-                              background: 'rgba(59, 130, 246, 0.1)',
-                              border: '1px solid rgba(59, 130, 246, 0.3)',
+                              background: '#E7F0FE',
+                              border: '1px solid #C4DAF8',
                             }}
                           >
                             <Typography variant="h4" color="info.main" fontWeight={700}>
@@ -1327,16 +1295,14 @@ const CrawlDetail = () => {
                 <Fade in timeout={1400}>
                   <Card
                     sx={{
-                      background: 'rgba(26, 31, 58, 0.6)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                      backgroundColor: 'background.paper',
                     }}
                   >
                     <CardContent>
                       <Typography variant="h6" gutterBottom fontWeight={600}>
                         Detaylı Bilgiler
                       </Typography>
-                      <Divider sx={{ mb: 2, borderColor: 'rgba(99, 102, 241, 0.2)' }} />
+                      <Divider sx={{ mb: 2, borderColor: 'divider' }} />
                       <List>
                         <ListItem>
                           <ListItemText
@@ -1422,22 +1388,20 @@ const CrawlDetail = () => {
                 <Fade in timeout={1400}>
                   <Card
                     sx={{
-                      background: 'rgba(26, 31, 58, 0.6)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                      backgroundColor: 'background.paper',
                     }}
                   >
                     <CardContent>
                       <Typography variant="h6" gutterBottom fontWeight={600}>
                         Seçili Linkler ({selectedNodes.size})
                       </Typography>
-                      <Divider sx={{ mb: 2, borderColor: 'rgba(99, 102, 241, 0.2)' }} />
+                      <Divider sx={{ mb: 2, borderColor: 'divider' }} />
                       {selectedNodes.size === 0 ? (
                         <Alert
                           severity="info"
                           sx={{
-                            background: 'rgba(99, 102, 241, 0.1)',
-                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                            background: '#ECEDFE',
+                            border: '1px solid #DDDEFF',
                           }}
                         >
                           Henüz link seçilmedi
@@ -1462,10 +1426,10 @@ const CrawlDetail = () => {
                                 sx={{
                                   p: 1.5,
                                   mb: 1,
-                                  background: 'rgba(99, 102, 241, 0.1)',
-                                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                                  background: '#ECEDFE',
+                                  border: '1px solid #E3E4FE',
                                   '&:hover': {
-                                    background: 'rgba(99, 102, 241, 0.2)',
+                                    background: '#E3E4FE',
                                   },
                                 }}
                               >
@@ -1510,16 +1474,16 @@ const CrawlDetail = () => {
           fullWidth
           PaperProps={{
             sx: {
-              background: 'rgba(26, 31, 58, 0.95)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(99, 102, 241, 0.3)',
+              backgroundColor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
             },
           }}
         >
           <DialogTitle
             sx={{
-              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)',
-              borderBottom: '1px solid rgba(99, 102, 241, 0.2)',
+              backgroundColor: 'background.default',
+              borderBottom: '1px solid #E3E4FE',
             }}
           >
             Link Detayları
@@ -1565,7 +1529,7 @@ const CrawlDetail = () => {
               </Box>
             )}
           </DialogContent>
-          <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(99, 102, 241, 0.2)' }}>
+          <DialogActions sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
             <Button
               onClick={() => setNodeDetailsDialog({ open: false, node: null })}
               variant="outlined"

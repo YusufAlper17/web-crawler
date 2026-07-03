@@ -35,8 +35,30 @@ import {
   GetApp,
 } from '@mui/icons-material'
 import { FormControlLabel, Checkbox } from '@mui/material'
-import { crawlApi, CrawlJobCreate } from '../services/api'
+import { CrawlerSettings, crawlApi, CrawlJobCreate } from '../services/api'
+import StatCard from '../components/StatCard'
 import toast from 'react-hot-toast'
+
+const readCrawlerSettings = (): CrawlerSettings | undefined => {
+  const saved = localStorage.getItem('crawlerSettings')
+  if (!saved) return undefined
+
+  try {
+    const parsed = JSON.parse(saved)
+    return {
+      request_delay: parsed.requestDelay,
+      timeout: parsed.timeout,
+      concurrent_requests: parsed.concurrentRequests,
+      user_agent: parsed.userAgent,
+      respect_robots_txt: parsed.respectRobotsTxt,
+      follow_redirects: parsed.followRedirects,
+      save_html_content: parsed.saveHtmlContent,
+      extract_metadata: parsed.extractMetadata,
+    }
+  } catch {
+    return undefined
+  }
+}
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -110,14 +132,7 @@ const Dashboard = () => {
   const startCrawlMutation = useMutation({
     mutationFn: (data: CrawlJobCreate) => crawlApi.startCrawl(data),
     onSuccess: (job) => {
-      toast.success('Crawl başlatıldı!', {
-        icon: '🚀',
-        style: {
-          borderRadius: '10px',
-          background: '#1a1f3a',
-          color: '#e0e0e0',
-        },
-      })
+      toast.success('Crawl başlatıldı!')
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
       navigate(`/crawl/${job.id}`)
     },
@@ -157,6 +172,7 @@ const Dashboard = () => {
       base_url: validUrl,
       max_depth: maxDepth,
       max_pages: unlimitedPages ? 999999 : maxPages,
+      settings: readCrawlerSettings(),
     })
   }
 
@@ -164,7 +180,7 @@ const Dashboard = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
+        backgroundColor: 'background.default',
         pb: 4,
       }}
     >
@@ -179,14 +195,9 @@ const Dashboard = () => {
                   <Typography
                     variant="h2"
                     fontWeight={800}
-                    sx={{
-                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                    }}
+                    color="text.primary"
                   >
-                    Web Crawler
+                    CrawlScope
                   </Typography>
                   <Typography variant="h6" color="text.secondary">
                     Gelişmiş ve ölçeklenebilir web tarayıcı ile sitenizi analiz edin
@@ -229,103 +240,16 @@ const Dashboard = () => {
         <Fade in timeout={800}>
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                  color: 'white',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(99, 102, 241, 0.4)' },
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="h4" fontWeight={700}>
-                        {stats.total}
-                      </Typography>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Toplam Job
-                      </Typography>
-                    </Box>
-                    <AnalyticsIcon sx={{ fontSize: 40, opacity: 0.8 }} />
-                  </Box>
-                </CardContent>
-              </Card>
+              <StatCard value={stats.total} label="Toplam Job" tone="indigo" icon={<AnalyticsIcon />} />
             </Grid>
-
             <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  color: 'white',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)' },
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="h4" fontWeight={700}>
-                        {stats.running}
-                      </Typography>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Çalışan
-                      </Typography>
-                    </Box>
-                    <Speed sx={{ fontSize: 40, opacity: 0.8 }} />
-                  </Box>
-                </CardContent>
-              </Card>
+              <StatCard value={stats.running} label="Çalışan" tone="blue" icon={<Speed />} />
             </Grid>
-
             <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                  color: 'white',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(59, 130, 246, 0.4)' },
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="h4" fontWeight={700}>
-                        {stats.completed}
-                      </Typography>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Tamamlanan
-                      </Typography>
-                    </Box>
-                    <CheckCircle sx={{ fontSize: 40, opacity: 0.8 }} />
-                  </Box>
-                </CardContent>
-              </Card>
+              <StatCard value={stats.completed} label="Tamamlanan" tone="green" icon={<CheckCircle />} />
             </Grid>
-
             <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                  color: 'white',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(245, 158, 11, 0.4)' },
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="h4" fontWeight={700}>
-                        {stats.totalPages.toLocaleString()}
-                      </Typography>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Toplam Sayfa
-                      </Typography>
-                    </Box>
-                    <Timeline sx={{ fontSize: 40, opacity: 0.8 }} />
-                  </Box>
-                </CardContent>
-              </Card>
+              <StatCard value={stats.totalPages.toLocaleString()} label="Toplam Sayfa" tone="amber" icon={<Timeline />} />
             </Grid>
           </Grid>
         </Fade>
@@ -337,9 +261,7 @@ const Dashboard = () => {
               <Card
                 sx={{
                   height: '100%',
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                 }}
               >
                 <CardContent>
@@ -446,9 +368,7 @@ const Dashboard = () => {
             <Fade in timeout={1200}>
               <Card
                 sx={{
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                 }}
               >
                 <CardContent>
@@ -487,8 +407,7 @@ const Dashboard = () => {
                     <Alert
                       severity="info"
                       sx={{
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        border: '1px solid rgba(99, 102, 241, 0.3)',
+                        backgroundColor: 'background.paper',
                       }}
                     >
                       Henüz crawl başlatılmamış. İlk crawl'ınızı başlatın!
@@ -560,19 +479,14 @@ const JobCard = ({
           p: 2.5,
           mb: 2,
           cursor: 'pointer',
-          background: hovered
-            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)'
-            : 'rgba(26, 31, 58, 0.4)',
+          backgroundColor: hovered ? 'rgba(79, 70, 229, 0.08)' : 'background.paper',
           border: '1px solid',
-          borderColor: hovered ? 'primary.main' : 'rgba(99, 102, 241, 0.1)',
+          borderColor: hovered ? 'primary.main' : 'divider',
           transition: 'all 0.3s',
           position: 'relative',
           overflow: 'hidden',
           '&:hover': {
-            transform: 'translateX(8px)',
-            boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
-            borderRight: '3px solid',
-            borderRightColor: 'primary.main',
+            transform: 'translateX(6px)',
           },
         }}
         onClick={() => navigate(`/crawl/${job.id}`)}
@@ -608,9 +522,7 @@ const JobCard = ({
             noWrap
             sx={{
               mb: 1,
-              background: 'linear-gradient(135deg, #e0e0e0 0%, #a0a0a0 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: 'text.primary',
             }}
           >
             {job.base_url}

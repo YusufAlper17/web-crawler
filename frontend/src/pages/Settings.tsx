@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import {
   Container,
   Box,
@@ -28,24 +29,39 @@ import {
   Storage,
 } from '@mui/icons-material'
 import toast from 'react-hot-toast'
+import { crawlApi } from '../services/api'
 
 const Settings = () => {
   const navigate = useNavigate()
+  const { data: runtimeSettings } = useQuery({
+    queryKey: ['runtimeSettings'],
+    queryFn: () => crawlApi.getRuntimeSettings(),
+  })
   
-  // Ayarlar state'i (localStorage'dan okunabilir)
-  const [settings, setSettings] = useState({
-    maxDepth: 10,
-    maxPages: 10000,
-    requestDelay: 1.0,
-    timeout: 30,
-    concurrentRequests: 10,
-    userAgent: 'WebCrawler/1.0',
-    respectRobotsTxt: true,
-    followRedirects: true,
-    autoRetry: true,
-    maxRetries: 3,
-    saveHtmlContent: true,
-    extractMetadata: true,
+  const [settings, setSettings] = useState(() => {
+    const defaults = {
+      maxDepth: 10,
+      maxPages: 10000,
+      requestDelay: 1.0,
+      timeout: 30,
+      concurrentRequests: 10,
+      userAgent: 'CrawlScope/1.0 (+https://example.com/bot)',
+      respectRobotsTxt: true,
+      followRedirects: true,
+      autoRetry: true,
+      maxRetries: 3,
+      saveHtmlContent: true,
+      extractMetadata: true,
+    }
+
+    const saved = localStorage.getItem('crawlerSettings')
+    if (!saved) return defaults
+
+    try {
+      return { ...defaults, ...JSON.parse(saved) }
+    } catch {
+      return defaults
+    }
   })
 
   const handleChange = (field: string, value: any) => {
@@ -55,14 +71,7 @@ const Settings = () => {
   const handleSave = () => {
     // LocalStorage'a kaydet
     localStorage.setItem('crawlerSettings', JSON.stringify(settings))
-    toast.success('Ayarlar kaydedildi!', {
-      icon: '✅',
-      style: {
-        borderRadius: '10px',
-        background: '#1a1f3a',
-        color: '#e0e0e0',
-      },
-    })
+    toast.success('Ayarlar kaydedildi!')
   }
 
   const handleReset = () => {
@@ -89,7 +98,7 @@ const Settings = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
+        backgroundColor: 'background.default',
         pb: 4,
       }}
     >
@@ -99,9 +108,7 @@ const Settings = () => {
           <Card
             sx={{
               mb: 3,
-              background: 'rgba(26, 31, 58, 0.6)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(99, 102, 241, 0.2)',
+              backgroundColor: 'background.paper',
             }}
           >
             <CardContent>
@@ -122,13 +129,9 @@ const Settings = () => {
                   <Typography
                     variant="h4"
                     fontWeight={700}
-                    sx={{
-                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
+                    color="text.primary"
                   >
-                    ⚙️ Crawler Ayarları
+                    Crawler Ayarları
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                     Crawler davranışını özelleştirin
@@ -158,12 +161,15 @@ const Settings = () => {
         <Grid container spacing={3}>
           {/* Genel Ayarlar */}
           <Grid item xs={12}>
+            {runtimeSettings && (
+              <Alert severity="info" sx={{ mb: 3 }}>
+                Deploy hedefi: {runtimeSettings.deployment_target} · Database: {runtimeSettings.database_engine} · API: {runtimeSettings.api_base_path}
+              </Alert>
+            )}
             <Fade in timeout={800}>
               <Card
                 sx={{
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                 }}
               >
                 <CardContent>
@@ -264,9 +270,7 @@ const Settings = () => {
             <Fade in timeout={1000}>
               <Card
                 sx={{
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                 }}
               >
                 <CardContent>
@@ -331,9 +335,7 @@ const Settings = () => {
             <Fade in timeout={1200}>
               <Card
                 sx={{
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                 }}
               >
                 <CardContent>
@@ -387,16 +389,14 @@ const Settings = () => {
             <Fade in timeout={1400}>
               <Card
                 sx={{
-                  background: 'rgba(26, 31, 58, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  backgroundColor: 'background.paper',
                 }}
               >
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <Speed sx={{ mr: 1, color: 'primary.main' }} />
                     <Typography variant="h6" fontWeight={600}>
-                      💡 Performans Önerileri
+                      Performans Önerileri
                     </Typography>
                   </Box>
                   <Divider sx={{ mb: 3, borderColor: 'rgba(99, 102, 241, 0.2)' }} />

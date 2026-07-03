@@ -4,14 +4,17 @@ from sqlalchemy import text
 from typing import List, Optional
 import asyncio
 import logging
+from datetime import datetime, timedelta
 
 from app.database.connection import SessionLocal
 from app.models.crawl_job import CrawlJob, JobStatus
 from app.models.page import Page
 from app.models.link import Link
+from app.config import settings
 from app.api.schemas import (
     CrawlJobCreate, CrawlJobResponse, PageResponse, 
-    LinkResponse, TreeResponse, TreeNode, CrawlStatusResponse
+    LinkResponse, TreeResponse, TreeNode, CrawlStatusResponse,
+    AnalyticsSummaryResponse, RuntimeSettingsResponse, CrawlerSettings
 )
 from app.crawler.engine import CrawlerEngine
 from app.utils.url_normalizer import is_valid_url
@@ -43,7 +46,8 @@ async def start_crawl(
         base_url=job_data.base_url,
         max_depth=job_data.max_depth or 10,
         max_pages=job_data.max_pages or 10000,
-        status=JobStatus.PENDING
+        status=JobStatus.PENDING,
+        settings=job_data.settings.model_dump(exclude_none=True) if job_data.settings else None
     )
     db.add(job)
     db.commit()
@@ -55,6 +59,77 @@ async def start_crawl(
     logger.info(f"✅ Crawl job başlatıldı: {job.id} - {job.base_url}")
     
     return job
+
+
+@router.get("/settings", response_model=RuntimeSettingsResponse)
+def get_runtime_settings():
+    """Deployment ve varsayılan crawler ayarlarını döndürür."""
+    database_engine = "postgres" if settings.DATABASE_URL.startswith("postgres") else "sqlite"
+    return RuntimeSettingsResponse(
+        api_base_path=settings.API_V1_PREFIX,
+        frontend_url=settings.PUBLIC_FRONTEND_URL,
+        database_engine=database_engine,
+        deployment_target=settings.DEPLOYMENT_TARGET,
+        crawler_defaults=CrawlerSettings(
+            request_delay=settings.REQUEST_DELAY,
+            timeout=settings.TIMEOUT,
+            concurrent_requests=settings.CONCURRENT_REQUESTS,
+            user_agent=settings.USER_AGENT,
+            respect_robots_txt=True,
+            follow_redirects=True,
+            save_html_content=True,
+            extract_metadata=True,
+        ),
+    )
+
+
+@router.get("/analytics/summary", response_model=AnalyticsSummaryResponse)
+def get_analytics_summary(db: Session = Depends(get_db)):
+    """Dashboard ve analytics ekranları için gerçek özet metrikleri döndürür."""
+    jobs = db.query(CrawlJob).all()
+    total_jobs = len(jobs)
+    total_pages = sum(job.pages_crawled for job in jobs)
+    failed_pages = sum(job.pages_failed for job in jobs)
+    processed_pages = total_pages + failed_pages
+    success_rate = round((total_pages / processed_pages) * 100, 1) if processed_pages else 0.0
+
+    status_counts = {status.value: 0 for status in JobStatus}
+    for job in jobs:
+        status_counts[job.status.value] = status_counts.get(job.status.value, 0) + 1
+
+    today = datetime.utcnow().date()
+    daily_activity = []
+    for day_offset in range(6, -1, -1):
+        day = today - timedelta(days=day_offset)
+        day_jobs = [
+            job for job in jobs
+            if job.created_at and job.created_at.date() == day
+        ]
+        daily_activity.append({
+            "date": day.isoformat(),
+            "jobs": len(day_jobs),
+            "pages": sum(job.pages_crawled for job in day_jobs),
+            "failed_pages": sum(job.pages_failed for job in day_jobs),
+        })
+
+    return AnalyticsSummaryResponse(
+        total_jobs=total_jobs,
+        running_jobs=status_counts.get(JobStatus.RUNNING.value, 0),
+        completed_jobs=status_counts.get(JobStatus.COMPLETED.value, 0),
+        failed_jobs=status_counts.get(JobStatus.FAILED.value, 0),
+        paused_jobs=status_counts.get(JobStatus.PAUSED.value, 0),
+        cancelled_jobs=status_counts.get(JobStatus.CANCELLED.value, 0),
+        total_pages=total_pages,
+        failed_pages=failed_pages,
+        success_rate=success_rate,
+        average_pages_per_job=round(total_pages / total_jobs) if total_jobs else 0,
+        status_breakdown=[
+            {"status": status, "count": count}
+            for status, count in status_counts.items()
+            if count > 0
+        ],
+        daily_activity=daily_activity,
+    )
 
 
 async def run_crawler(job_id: int):

@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: crawlscope-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DEPLOYMENT_TARGET
+        value: render
+      - key: API_V1_PREFIX
+        value: /api/v1
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crawlscope-postgres
+          property: connectionString
+      - key: PUBLIC_FRONTEND_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+databases:
+  - name: crawlscope-postgres
+    databaseName: crawlscope
+    user: crawlscope

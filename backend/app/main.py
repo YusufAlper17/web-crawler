@@ -47,12 +47,10 @@ async def log_requests(request: Request, call_next):
         logger.error(f"❌ {request.method} {request.url.path} - Error: {str(e)}")
         raise
 
-# CORS middleware
-# Development için tüm origin'lere izin ver
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Development için tüm origin'lere izin
-    allow_credentials=False,  # "*" ile credentials kullanılamaz
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],

@@ -13,6 +13,18 @@ export interface CrawlJobCreate {
   base_url: string
   max_depth?: number
   max_pages?: number
+  settings?: CrawlerSettings
+}
+
+export interface CrawlerSettings {
+  request_delay?: number
+  timeout?: number
+  concurrent_requests?: number
+  user_agent?: string
+  respect_robots_txt?: boolean
+  follow_redirects?: boolean
+  save_html_content?: boolean
+  extract_metadata?: boolean
 }
 
 export interface CrawlJob {
@@ -26,6 +38,7 @@ export interface CrawlJob {
   created_at: string
   started_at?: string
   completed_at?: string
+  settings?: CrawlerSettings
 }
 
 export interface CrawlStatus {
@@ -61,6 +74,29 @@ export interface TreeResponse {
   root: TreeNode
   total_nodes: number
   max_depth: number
+}
+
+export interface AnalyticsSummary {
+  total_jobs: number
+  running_jobs: number
+  completed_jobs: number
+  failed_jobs: number
+  paused_jobs: number
+  cancelled_jobs: number
+  total_pages: number
+  failed_pages: number
+  success_rate: number
+  average_pages_per_job: number
+  status_breakdown: Array<{ status: string; count: number }>
+  daily_activity: Array<{ date: string; jobs: number; pages: number; failed_pages: number }>
+}
+
+export interface RuntimeSettings {
+  api_base_path: string
+  frontend_url: string
+  database_engine: string
+  deployment_target: string
+  crawler_defaults: CrawlerSettings
 }
 
 export const crawlApi = {
@@ -111,6 +147,16 @@ export const crawlApi = {
     const response = await api.get<CrawlJob[]>('/jobs', {
       params: { skip, limit },
     })
+    return response.data
+  },
+
+  getAnalyticsSummary: async (): Promise<AnalyticsSummary> => {
+    const response = await api.get<AnalyticsSummary>('/analytics/summary')
+    return response.data
+  },
+
+  getRuntimeSettings: async (): Promise<RuntimeSettings> => {
+    const response = await api.get<RuntimeSettings>('/settings')
     return response.data
   },
 

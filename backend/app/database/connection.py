@@ -7,8 +7,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Database bağlantı ayarları - SQLite veya PostgreSQL
+database_url = settings.DATABASE_URL
 connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
+if database_url.startswith("sqlite"):
     # SQLite için özel ayarlar
     connect_args = {"check_same_thread": False}
     engine = create_engine(
@@ -24,9 +25,11 @@ if settings.DATABASE_URL.startswith("sqlite"):
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
 else:
+    if database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
     # PostgreSQL için ayarlar
     engine = create_engine(
-        settings.DATABASE_URL,
+        database_url,
         pool_pre_ping=True,
         pool_size=10,
         max_overflow=20,
