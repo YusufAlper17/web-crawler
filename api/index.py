@@ -27,6 +27,7 @@ from sqlalchemy import (
     Boolean, JSON, Enum as SAEnum, func, text,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from sqlalchemy.pool import NullPool
 
 API_PREFIX = "/api/v1"
 
@@ -50,7 +51,14 @@ DATABASE_URL = _resolve_database_url()
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False}, pool_pre_ping=True)
 else:
-    engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_recycle=300)
+    # Serverless + Supabase pgbouncer uyumu: bağlantı havuzu tutma (NullPool) ve
+    # prepared statement'ları kapat (transaction pooler ile uyumlu olması için).
+    engine = create_engine(
+        DATABASE_URL,
+        poolclass=NullPool,
+        pool_pre_ping=True,
+        connect_args={"prepare_threshold": None},
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
