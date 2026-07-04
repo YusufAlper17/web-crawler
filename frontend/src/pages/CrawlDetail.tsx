@@ -149,6 +149,7 @@ const CrawlDetail = () => {
   })
 
   const steppingRef = useRef(false)
+  const stopSteppingRef = useRef(false)
 
   useEffect(() => {
     if (pagesData) {
@@ -164,17 +165,19 @@ const CrawlDetail = () => {
     if (steppingRef.current) return
 
     let cancelled = false
+    stopSteppingRef.current = false
     const drive = async () => {
       steppingRef.current = true
       try {
-        while (!cancelled) {
+        while (!cancelled && !stopSteppingRef.current) {
           const res = await crawlApi.stepCrawl(Number(jobId))
           queryClient.invalidateQueries({ queryKey: ['crawlStatus', jobId] })
           queryClient.invalidateQueries({ queryKey: ['crawlJob', jobId] })
           queryClient.invalidateQueries({ queryKey: ['crawlPages', jobId] })
           queryClient.invalidateQueries({ queryKey: ['crawlTree', jobId] })
           if (res.status !== 'running' && res.status !== 'pending') break
-          await new Promise((r) => setTimeout(r, 350))
+          if (stopSteppingRef.current) break
+          await new Promise((r) => setTimeout(r, 250))
         }
       } catch {
         // Adım hatası: polling durumu zaten yansıtacak
@@ -227,29 +230,50 @@ const CrawlDetail = () => {
     previousTreeNodes.current = tree?.total_nodes || 0
   }, [tree])
 
+  // Adım sürücüsünü anında durdurur ve UI'ı iyimser günceller (hızlı tepki için)
+  const setStatusOptimistic = (newStatus: string) => {
+    queryClient.setQueryData(['crawlStatus', jobId], (old: any) =>
+      old ? { ...old, status: newStatus } : old,
+    )
+    queryClient.setQueryData(['crawlJob', jobId], (old: any) =>
+      old ? { ...old, status: newStatus } : old,
+    )
+  }
+
   const pauseMutation = useMutation({
     mutationFn: () => crawlApi.pauseCrawl(Number(jobId)),
+    onMutate: () => {
+      stopSteppingRef.current = true
+      setStatusOptimistic('paused')
+    },
     onSuccess: () => {
       toast.success('Crawl duraklatıldı')
-      queryClient.invalidateQueries({ queryKey: ['crawlJob', jobId] })
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
   })
 
   const resumeMutation = useMutation({
     mutationFn: () => crawlApi.resumeCrawl(Number(jobId)),
+    onMutate: () => {
+      stopSteppingRef.current = false
+      setStatusOptimistic('running')
+    },
     onSuccess: () => {
       toast.success('Crawl devam ediyor')
       queryClient.invalidateQueries({ queryKey: ['crawlJob', jobId] })
+      queryClient.invalidateQueries({ queryKey: ['crawlStatus', jobId] })
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
   })
 
   const cancelMutation = useMutation({
     mutationFn: () => crawlApi.cancelCrawl(Number(jobId)),
+    onMutate: () => {
+      stopSteppingRef.current = true
+      setStatusOptimistic('cancelled')
+    },
     onSuccess: () => {
       toast.success('Crawl iptal edildi')
-      queryClient.invalidateQueries({ queryKey: ['crawlJob', jobId] })
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
   })

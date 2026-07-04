@@ -13,6 +13,7 @@ ki Vercel'in fonksiyon boyut limitine takılmasın.
 import os
 import time
 import enum
+import asyncio
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict
 from urllib.parse import urlparse, urljoin, urlunparse, parse_qs
@@ -226,8 +227,9 @@ def _status_dict(job: CrawlJob) -> dict:
 # --------------------------------------------------------------------------- #
 # Step crawler
 # --------------------------------------------------------------------------- #
-STEP_TIME_BUDGET = float(os.environ.get("STEP_TIME_BUDGET", "12"))   # saniye
-STEP_MAX_PAGES = int(os.environ.get("STEP_MAX_PAGES", "6"))          # adım başına sayfa
+STEP_MAX_PAGES = int(os.environ.get("STEP_MAX_PAGES", "8"))          # adım başına sayfa
+STEP_CONCURRENCY = int(os.environ.get("STEP_CONCURRENCY", "8"))      # adım içi paralel istek
+STEP_TIMEOUT = int(os.environ.get("STEP_TIMEOUT", "15"))             # istek zaman aşımı (sn)
 
 
 def _setting(job: CrawlJob, key: str, default):
@@ -277,13 +279,22 @@ def _build_frontier(db, job: CrawlJob, visited: set) -> List[Dict]:
     return sorted(best.values(), key=lambda x: x["depth"])
 
 
-async def _crawl_one(client: httpx.AsyncClient, db, job: CrawlJob, item: Dict, site_type_holder: Dict):
+async def _fetch_one(client: httpx.AsyncClient, sem: asyncio.Semaphore, item: Dict):
+    """Bir URL'yi paralel olarak indirir; DB'ye dokunmaz (thread-safe olması için)."""
+    async with sem:
+        try:
+            resp = await client.get(item["url"])
+            return item, resp, None
+        except Exception as exc:  # noqa: BLE001
+            return item, None, exc
+
+
+def _persist_result(db, job: CrawlJob, item: Dict, resp, err, site_type_holder: Dict):
+    """İndirilen bir sonucu (yanıt ya da hata) DB'ye sıralı şekilde yazar."""
     url = item["url"]
     depth = item["depth"]
     parent_url = item.get("parent_url")
-    try:
-        resp = await client.get(url)
-    except Exception:
+    if err is not None or resp is None:
         job.pages_failed = (job.pages_failed or 0) + 1
         return
 
@@ -377,30 +388,31 @@ async def run_step(db, job: CrawlJob) -> dict:
         return _status_dict(job)
 
     site_type_holder: Dict = {}
-    request_delay = float(_setting(job, "request_delay", 0.2))
-    timeout = int(_setting(job, "timeout", 20))
+    timeout = int(_setting(job, "timeout", STEP_TIMEOUT))
     user_agent = _setting(job, "user_agent", "CrawlScope/1.0 (+https://vercel.app)")
     follow_redirects = bool(_setting(job, "follow_redirects", True))
+    try:
+        concurrency = int(_setting(job, "concurrent_requests", STEP_CONCURRENCY) or STEP_CONCURRENCY)
+    except (TypeError, ValueError):
+        concurrency = STEP_CONCURRENCY
+    concurrency = max(1, min(concurrency, 10))
 
-    processed = 0
-    start = time.time()
+    # Bu adımda çekilecek grup: frontier zaten ziyaret edilenleri dışlar ve
+    # target_url bazında tekildir. Kalan kotayı aşmayacak kadarını al.
+    remaining_quota = job.max_pages - (job.pages_crawled or 0)
+    limit = max(1, min(STEP_MAX_PAGES, remaining_quota))
+    batch = frontier[:limit]
+
+    # Grubu paralel indir (ağ), sonra sıralı yaz (DB güvenliği).
+    sem = asyncio.Semaphore(concurrency)
     async with httpx.AsyncClient(
         timeout=timeout, follow_redirects=follow_redirects,
         headers={"User-Agent": user_agent},
     ) as client:
-        for item in frontier:
-            if processed >= STEP_MAX_PAGES or (time.time() - start) > STEP_TIME_BUDGET:
-                break
-            if (job.pages_crawled or 0) >= job.max_pages:
-                break
-            if item["url"] in visited:
-                continue
-            visited.add(item["url"])
-            await _crawl_one(client, db, job, item, site_type_holder)
-            processed += 1
-            if request_delay > 0:
-                import asyncio
-                await asyncio.sleep(min(request_delay, 1.0))
+        results = await asyncio.gather(*[_fetch_one(client, sem, it) for it in batch])
+
+    for item, resp, err in results:
+        _persist_result(db, job, item, resp, err, site_type_holder)
 
     db.commit()
     db.refresh(job)
@@ -721,9 +733,9 @@ def get_settings():
         "deployment_target": os.environ.get("DEPLOYMENT_TARGET", "vercel"),
         "crawl_mode": "step",
         "crawler_defaults": {
-            "request_delay": 0.2,
-            "timeout": 20,
-            "concurrent_requests": 1,
+            "request_delay": 0,
+            "timeout": STEP_TIMEOUT,
+            "concurrent_requests": STEP_CONCURRENCY,
             "user_agent": "CrawlScope/1.0 (+https://vercel.app)",
             "respect_robots_txt": False,
             "follow_redirects": True,

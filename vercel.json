@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "regions": ["syd1"],
   "builds": [
     {
       "src": "frontend/package.json",
@@ -13,8 +14,9 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/assets/(.*)", "dest": "/frontend/assets/$1" },
     { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/(.*)", "dest": "/frontend/index.html" }
   ],
   "crons": [
     { "path": "/api/cron/keepalive", "schedule": "0 6 * * *" }
