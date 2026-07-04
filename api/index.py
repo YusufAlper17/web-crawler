@@ -24,7 +24,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, Integer, String, DateTime, Text, ForeignKey,
-    Boolean, JSON, Enum as SAEnum, func,
+    Boolean, JSON, Enum as SAEnum, func, text,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
@@ -689,6 +689,18 @@ def analytics_summary(db=Depends(get_db)):
         ],
         "daily_activity": daily,
     }
+
+
+@app.get("/api/cron/keepalive")
+@app.get(API_PREFIX + "/keepalive")
+def keepalive(db=Depends(get_db)):
+    """Supabase free-tier'ın hareketsizlikten askıya alınmasını önlemek için
+    veritabanına küçük bir istek atar. Vercel Cron tarafından günlük tetiklenir."""
+    try:
+        db.execute(text("SELECT 1"))
+        return {"status": "ok", "database": "reachable", "timestamp": datetime.utcnow().isoformat()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"DB error: {str(e)[:200]}")
 
 
 @app.get(API_PREFIX + "/settings")
