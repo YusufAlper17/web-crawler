@@ -1,0 +1,8 @@
+# Vercel Python Function bağımlılıkları (fonksiyonun yanında olmalı ki kurulsun).
+# Hafif tutuldu: pandas/openpyxl/tldextract/lxml YOK -> boyut limitine takılmaz.
+fastapi==0.104.1
+sqlalchemy>=2.0.30
+pydantic>=2.5.0
+httpx==0.25.2
+beautifulsoup4==4.12.2
+psycopg[binary]>=3.2.0
